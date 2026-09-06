@@ -1,0 +1,65 @@
+# Workflow derived from https://github.com/r-lib/actions/blob/v2/examples/check-standard.yaml
+# License: MIT
+name: R-CMD-check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: windows-latest, r: "release"}
+          - {os: macos-latest,   r: "release"}
+          - {os: ubuntu-latest,  r: "release"}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.os }}
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: any
+          extra-packages: |
+            any::rstanarm
+            any::logistf
+          needs: website
+
+      - uses: r-lib/actions/check-r-package@v2
+
+      - name: Show testthat output
+        if: always()
+        shell: Rscript {0}
+        run: |
+          options(crayon.enabled = FALSE)
+          cat(knitr::knit("${{ github.workspace }}/.github/workflows/test-output.Rmd",
+                          output = "${{ github.workspace }}/test-output.md",
+                          quiet = TRUE))
+        if: failure()
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-output-${{ matrix.config.os }}-${{ matrix.config.r }}
+          path: test-output.md
