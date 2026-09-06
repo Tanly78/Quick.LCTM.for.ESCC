@@ -1,0 +1,58 @@
+# pkgdown reference index
+# Build locally with: pkgdown::build_site()
+# Auto-deploy to GitHub Pages via .github/workflows/pkgdown.yaml
+
+url: https://Tanly78.github.io/quick.lctm.escc
+
+reference:
+  - title: "Main workflow"
+    desc: "End-to-end classification of new patients"
+    contents:
+      - predict_lctm7m
+      - lctm_v8_params
+  - title: "Model fitting"
+    desc: "Train a fresh LCTM (requires rstanarm)"
+    contents:
+      - fit_lctm_full
+      - fit_lctm_partial
+  - title: "Score helpers"
+    desc: "Marker z-scoring and trajectory bend score"
+    contents:
+      - zscore_within_cohort
+      - flip_crp
+      - trajectory_bend_score
+      - compute_7m_score
+  - title: "Package internals"
+    contents:
+      - quick.lctm.escc-package
+
+articles:
+  - title: "Articles"
+    contents:
+      - introduction
+      - L1_full_analysis
+
+navbar:
+  type: default
+  left:
+    - home
+    - reference
+    - articles
+    - news
+  right:
+    - github
+    - search
+
+news:
+  one_page: false
+
+repo:
+  url:
+    home: https://github.com/Tanly78/quick.lctm.escc
+    source: https://github.com/Tanly78/quick.lctm.escc/blob/main/
+    issue: https://github.com/Tanly78/quick.lctm.escc/issues/
+    user: https://github.com/example
+  branch: main
+
+development:
+  mode: release

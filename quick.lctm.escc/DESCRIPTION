@@ -1,0 +1,26 @@
+Package: quick.lctm.escc
+Type: Package
+Title: Latent Class Trajectory Modeling for 7 Nutritional Markers
+Version: 0.1.0
+Authors@R: 
+    person(given = "Anonymous", family = "Package", role = c("aut", "cre"),
+           email = "package@example.com",
+           comment = c(ORCID = "0009-0000-6575-5277"))
+Description: Fits Bayesian latent class trajectory models (LCTM) on 7 nutritional
+    and inflammatory markers (ALB, TC, LYM, CRP, SMI, SFI, VFI) measured at
+    multiple time points to classify oesophageal cancer patients into Resilient
+    (RC) vs Vulnerable (VC) nutritional trajectory classes. Provides a 2-level input design: full 5-timepoint LCTM (L1) and partial 2-4 timepoint LCTM (L2, with MCMC imputation), using only the 7 nutritional and inflammatory markers (ALB, TC, LYM, CRP, SMI, SFI, VFI). Includes pre-trained v8 parameters for offline prediction without MCMC.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.4)
+Imports: methods, stats, dplyr, tidyr
+Suggests: testthat (>= 3.0.0), knitr, rmarkdown, rstanarm (>= 2.21)
+VignetteBuilder: knitr
+LazyData: true
+URL: https://github.com/Tanly78/Quick_LCTM_for_ESCC
+BugReports: https://github.com/Tanly78/Quick_LCTM_for_ESCC/issues
+Config/roxygen2/version: 8.1.0
+Author: Anonymous [aut, cre] (ORCID: 0009-0000-6575-5277)
+Maintainer: Anonymous <package@example.com>
+NeedsCompilation: no
+Packaged: 2026-09-05 09:39:44 UTC; Anonymous

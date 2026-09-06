@@ -1,0 +1,63 @@
+#' Pre-trained LCTM v8 Posterior Parameters
+#'
+#' A list containing class-conditional 7-marker trajectory
+#' parameters from the v8 training cohort (n=219 ESCC nCIT patients),
+#' plus the per-marker z-score reference used to aggregate raw
+#' 7-marker inputs to a single composite z per timepoint. Use for
+#' offline prediction without MCMC.
+#'
+#' @format A list with the following components:
+#' \describe{
+#'   \item{ref_mean}{Named numeric vector of length 7: per-marker
+#'     mean (across all 219 patients and 5 timepoints), used to
+#'     z-score raw inputs. Markers: ALB, TC, LYM, CRP, SMI, SFI, VFI.}
+#'   \item{ref_sd}{Named numeric vector of length 7: per-marker SD
+#'     (ddof=1; same scale as R's \code{sd()}).}
+#'   \item{negative}{Character vector of length 1: marker names that
+#'     are sign-flipped before averaging (\code{"CRP"}: high raw CRP
+#'     indicates inflammation, so z is negated).}
+#'   \item{times}{Numeric vector of length 5: canonical timepoint
+#'     positions used by the Stan trajectory model
+#'     (0, 1, 2, 3, 4 corresponding to T1_pre, T2_post, T4_3M,
+#'     T5_6M, T6_1Y).}
+#'   \item{timepoint_lab}{Character vector of length 5: canonical
+#'     long-form timepoint labels.}
+#'   \item{class_means}{Numeric matrix 2x2: class-conditional
+#'     posterior mean of (intercept, slope). Row 1 = RC, row 2 = VC.}
+#'   \item{class_props}{Named numeric vector of length 2: class-mixing
+#'     proportions (RC, VC).}
+#'   \item{sigma}{Numeric scalar: residual SD from the Stan fit.}
+#'   \item{composite_train}{Numeric matrix 219x5: composite z per
+#'     (patient, timepoint) computed by the same aggregation rule
+#'     used at prediction time. For diagnostic / sanity checks.}
+#'   \item{p_VC_train}{Numeric vector of length 219: training-cohort
+#'     posterior-mean \code{p_VC} (per Stan posterior mean over
+#'     4000 iterations). For diagnostic / sanity checks.}
+#'   \item{version}{Character. Version tag, e.g. \code{"v8.0"}.}
+#'   \item{training_n}{Integer. Number of training patients
+#'     (219).}
+#'   \item{source_rds}{Character. Path to the 41 MB Stan fit RDS
+#'     used to derive these parameters (preserved on the build
+#'     machine; not shipped).}
+#'   \item{source_csv}{Character. Path to the wide-format training
+#'     CSV (preserved on the build machine; not shipped).}
+#'   \item{source_commit}{Character. Git commit hash of the v8
+#'     source artifacts. Default \code{"pinned-external"}; set
+#'     environment variable \code{RPA_LCTM_V8_COMMIT} before
+#'     re-running \code{data-raw/extract_v8_params.R} to lock to a
+#'     specific commit.}
+#' }
+#'
+#' @source Derived from the n=219 ESCC nCIT cohort, 2026.
+#'   Aggregation rule matches
+#'   \code{01_Result/R3/LCTM_bayes/python/_bayesian_lctm.py}
+#'   lines 36-53.
+#'
+#' @examples
+#' \dontrun{
+#' data(lctm_v8_params)
+#' names(lctm_v8_params)
+#' lctm_v8_params$class_means
+#' lctm_v8_params$class_props
+#' }
+"lctm_v8_params"

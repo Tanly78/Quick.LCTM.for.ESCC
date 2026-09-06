@@ -1,0 +1,33 @@
+---
+title: "L1 Full 5-timepoint LCTM Analysis"
+author: "Anonymous"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{L1 Full 5-timepoint LCTM Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(quick.lctm.escc)
+```
+
+## L1: Full 5-timepoint LCTM
+
+This vignette demonstrates fitting the full LCTM with all 5 timepoints
+(T1, T2, T4, T5, T6) for the 7 nutritional markers.
+
+```{r eval=FALSE}
+data(example_lctm)
+fit <- fit_lctm_full(example_lctm, K = 2, n_iter = 1000, seed = 42)
+head(fit@posterior)
+table(fit@cluster)
+```
+
+## Interpretation
+
+- p_VC > 0.5  implies  classified as VC (Vulnerable Class)
+- p_RC > 0.5  implies  classified as RC (Resilient Class)
+- The model uses ONLY the 7-marker trajectory shape; no baseline covariates.

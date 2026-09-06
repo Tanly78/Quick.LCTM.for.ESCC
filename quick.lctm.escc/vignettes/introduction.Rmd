@@ -1,0 +1,117 @@
+---
+title: "Introduction to quick.lctm.escc"
+author: "Anonymous"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to quick.lctm.escc}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(quick.lctm.escc)
+```
+
+## What is quick.lctm.escc?
+
+quick.lctm.escc fits a Bayesian Latent Class Trajectory Model (LCTM) on **7
+nutritional / inflammatory markers** collected at up to 5 time points
+during neoadjuvant chemotherapy for oesophageal cancer.  The model
+classifies each patient into one of two latent classes:
+
+* **Resilient Class (RC)** -- nutritional trajectory stays high.
+* **Vulnerable Class (VC)** -- nutritional trajectory drops
+  sharply, indicating a need for intensive prehabilitation.
+
+The package uses only the 7 markers (ALB, TC, LYM, CRP, SMI, SFI, VFI);
+it does not require baseline demographic variables (sex, BMI, age,
+etc.) and ships a pre-trained v8 posterior for offline classification
+without re-running MCMC.
+
+## Required input format
+
+A long-format `data.frame` with one row per (patient, time-point):
+
+| Column | Type | Example values |
+|--------|------|----------------|
+| `id` | integer / character | `550193` |
+| `timepoint` | character | `T1` / `T2` / `T4` / `T5` / `T6` (or `T1_pre`, `T2_post`, `T4_3M`, `T5_6M`, `T6_1Y`) |
+| `ALB` | numeric | `43.5` g/L |
+| `TC` | numeric | `4.95` mmol/L |
+| `LYM` | numeric | `1.85` 10^9/L |
+| `CRP` | numeric | `7.4` mg/L |
+| `SMI` | numeric | `33.9` cm^2/m^2 (skeletal muscle index, CT) |
+| `SFI` | numeric | `62.2` cm^2/m^2 (subcutaneous fat index, CT) |
+| `VFI` | numeric | `60.4` cm^2/m^2 (visceral fat index, CT) |
+
+At least 2 distinct time-points per patient are required.
+
+## The 6-step user workflow
+
+### 1. Install
+
+```{r, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("Tanly78/quick.lctm.escc")
+```
+
+### 2. Load the package and prepare your data
+
+```{r}
+library(quick.lctm.escc)
+patients <- read.csv(
+  system.file("extdata", "example_lctm.csv", package = "quick.lctm.escc"),
+  stringsAsFactors = FALSE
+)
+str(patients)
+```
+
+### 3. Classify with the pre-trained v8 posterior
+
+```{r}
+pred <- predict_lctm7m(patients, use_pretrained = TRUE)
+head(pred)
+```
+
+`predict_lctm7m()` returns a `data.frame` with columns
+`id`, `p_VC`, and `cluster` (factor with levels `RC` < `VC`).
+Wall-clock time is < 0.1 s for 1000 patients because no MCMC is
+involved -- the function applies the v8 posterior means already bundled
+in the package.
+
+### 4. Stratify
+
+```{r}
+table(pred$cluster)
+```
+
+### 5. (Optional) Compute the Trajectory Bend Score
+
+```{r}
+t1 <- patients[patients$timepoint %in% c("T1", "T1_pre"), ]
+t2 <- patients[patients$timepoint %in% c("T2", "T2_post"), ]
+tbs <- trajectory_bend_score(t1, t2)
+head(tbs)
+```
+
+### 6. (Optional) Export results
+
+```{r, eval = FALSE}
+write.csv(pred, "patient_classification.csv", row.names = FALSE)
+```
+
+## Verifying the v8 posterior on your own cohort
+
+The v8 posterior is reproducible from the maintainer-hosted
+`stan_lctm_v8_K2_fit.rds` (41 MB, not shipped).  Use
+`data-raw/extract_v8_params.R` to regenerate the bundled
+`lctm_v8_params` rda.
+
+## Next steps
+
+* `vignette("L1_full_analysis")` -- train a fresh LCTM on your own
+  cohort using `fit_lctm_full()` (requires `rstanarm`).
+* `?predict_lctm7m` -- full argument reference.
+* `?lctm_v8_params` -- details of the bundled posterior.
